@@ -9,7 +9,14 @@ export async function POST(req) {
     const session = await getServerSession(authOptions)
 
     if (!session?.accessToken) {
-        return Response.json({ error: "Unauthorized" }, { status: 401 })
+        return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+    }
+
+    // Ensure required fields exist
+    const payload = {
+        title: body.title || "Untitled",
+        content: body.content || "",
+        status: body.status || "publish"
     }
 
     const res = await fetch(
@@ -20,10 +27,10 @@ export async function POST(req) {
                 "Content-Type": "application/json",
                 Authorization: `Bearer ${session.accessToken}`
             },
-            body: JSON.stringify(body) // e.g. { title: "My New Post", content: "Post content" }
+            body: JSON.stringify(payload)
         }
     )
 
     const data = await res.json()
-    return Response.json(data, { status: res.status })
+    return NextResponse.json(data, { status: res.status })
 }
