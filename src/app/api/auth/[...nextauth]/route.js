@@ -59,11 +59,9 @@ export const authOptions = {
   debug: true,
   callbacks: {
     async signIn({ account, profile }) {
-      console.log("SIGNIN CALLBACK", { account, profile })
       return true
     },
     async jwt({ token, account }) {
-      console.log("JWT CALLBACK", { token, account })
       if (account) {
         token.accessToken = account.access_token
         token.refreshToken = account.refresh_token
@@ -72,7 +70,6 @@ export const authOptions = {
       return token
     },
     async session({ session, token }) {
-      console.log("SESSION CALLBACK", { session, token })
       session.accessToken = token.accessToken
       session.refreshToken = token.refreshToken
       session.expiresAt = token.expiresAt

@@ -10,8 +10,8 @@ export default function RootLayout({ children }) {
       <body>
         <SessionProvider>
           <Header>
-            {children}
           </Header>
+          {children}
         </SessionProvider>
       </body>
     </html>
