@@ -7,6 +7,7 @@ export default function Posts() {
   const router = useRouter()
   const [posts, setPosts] = useState([])
   const [error, setError] = useState(null)
+  const [canEdit, setCanEdit] = useState(false)
 
   useEffect(() => {
     fetch("/api/posts")
@@ -17,6 +18,14 @@ export default function Posts() {
         } else {
           setError(data.error || data.message || "Failed to load posts")
         }
+      })
+  }, [])
+
+  useEffect(() => {
+    fetch("/api/auth/capabillities")
+      .then(res => res.json())
+      .then(data => {
+        setCanEdit(data.capabilities?.edit_posts === true)
       })
   }, [])
 
@@ -47,9 +56,11 @@ export default function Posts() {
       <div className="container mx-auto">
         <div className="flex justify-between items-center mb-4">
           <h1 className="text-2xl text-black">WordPress Posts</h1>
-          <button className="bg-blue-500 text-white px-4 py-2 rounded" onClick={handleCreate}>
-            Create New Post
-          </button>
+          {canEdit &&
+            <button className="bg-blue-500 text-white px-4 py-2 rounded" onClick={handleCreate}>
+              Create New Post
+            </button>
+          }
         </div>
         {error && <p>{error}</p>}
         <div className="grid grid-cols-1 gap-1">
@@ -57,14 +68,16 @@ export default function Posts() {
             <div className="p-3 px-4 bg-white rounded-xl text-black" key={post.ID || post.id}>
               <div className="flex justify-between">
                 <h2 className="text-xl mb-1">{post.title.rendered || post.title}</h2>
-                <div className="flex gap-2 text-sm text-gray-500">
-                  <Link className="hover:text-blue-600 flex items-center gap-1 cursor-pointer" href={`/posts/edit/${post.ID || post.id}`}>
-                    Edit
-                  </Link>
-                  <Link className="hover:text-red-600 flex items-center gap-1 cursor-pointer" href={`/posts/delete/${post.ID || post.id}`}>
-                    Delete
-                  </Link>
-                </div>
+                {canEdit &&
+                  <div className="flex gap-2 text-sm text-gray-500">
+                    <Link className="hover:text-blue-600 flex items-center gap-1 cursor-pointer" href={`/posts/edit/${post.ID || post.id}`}>
+                      Edit
+                    </Link>
+                    <Link className="hover:text-red-600 flex items-center gap-1 cursor-pointer" href={`/posts/delete/${post.ID || post.id}`}>
+                      Delete
+                    </Link>
+                  </div>
+                }
               </div>
               <div className="text-sm text-gray-700" dangerouslySetInnerHTML={{ __html: post.content.rendered || post.content }} />
             </div>
