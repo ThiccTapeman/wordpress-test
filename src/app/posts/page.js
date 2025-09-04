@@ -1,4 +1,6 @@
 "use client"
+import ActionButton from "@/components/ActionButton"
+import { Trash } from "lucide-react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
@@ -52,30 +54,24 @@ export default function Posts() {
   }
 
   return (
-    <section className="p-4 bg-gray-100 min-h-screen">
-      <div className="container mx-auto">
-        <div className="flex justify-between items-center mb-4">
-          <h1 className="text-2xl text-black">WordPress Posts</h1>
+    <section className="p-4 bg-white text-black min-h-screen">
+      <div className="container mx-auto mt-30">
+        <div className="flex flex-col md:flex-row justify-between items-center mb-4">
+          <h1 className="text-2xl font-bold mb-4 md:mb-0">WordPress Posts</h1>
           {canEdit &&
-            <button className="bg-blue-500 text-white px-4 py-2 rounded" onClick={handleCreate}>
-              Create New Post
-            </button>
+            <ActionButton button onClick={handleCreate} w="w-full md:w-max" additionalClasses="flex justify-center rounded-xl"> Create New Post</ActionButton>
           }
         </div>
         {error && <p>{error}</p>}
-        <div className="grid grid-cols-1 gap-1">
+        <div className="grid grid-cols-1 gap-10">
           {posts.map(post => (
-            <div className="p-3 px-4 bg-white rounded-xl text-black" key={post.ID || post.id}>
-              <div className="flex justify-between">
-                <h2 className="text-xl mb-1">{post.title.rendered || post.title}</h2>
+            <div className="p-10 px-12 bg-white rounded-xl text-black inset-shadow-sm shadow-sm" key={post.ID || post.id}>
+              <div className="flex justify-between flex-col-reverse md:flex-row w-full">
+                <h2 className="text-xl md:text-2xl font-bold mb-1 w-full">{post.title.rendered || post.title}</h2>
                 {canEdit &&
-                  <div className="flex gap-2 text-sm text-gray-500">
-                    <Link className="hover:text-blue-600 flex items-center gap-1 cursor-pointer" href={`/posts/edit/${post.ID || post.id}`}>
-                      Edit
-                    </Link>
-                    <Link className="hover:text-red-600 flex items-center gap-1 cursor-pointer" href={`/posts/delete/${post.ID || post.id}`}>
-                      Delete
-                    </Link>
+                  <div className="flex gap-4 text-sm text-gray-500 relative h-max w-full md:w-max mb-5 md:mb-0">
+                    <ActionButton href={`/posts/edit/${post.ID || post.id}`} secondary w={"w-full md:w-max"} additionalClasses="rounded-full h-max">Edit</ActionButton>
+                    <ActionButton href={`/posts/delete/${post.ID || post.id}`} secondaryInverted p="p-3" additionalClasses="rounded-full hover:bg-red-400 flex justify-center items-center"><Trash height={15} /></ActionButton>
                   </div>
                 }
               </div>

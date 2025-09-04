@@ -4,9 +4,9 @@ import Link from "next/link";
 export default function Header() {
     return (
         <>
-            <header className="p-4 bg-white text-black py-3 flex justify-between items-center shadow-md">
+            <header className="p-4 bg-white text-black py-3 shadow-sm fixed top-0 w-full z-10">
                 <div className="container mx-auto flex justify-between items-center">
-                    <h1 className="text-2xl font-normal">WordPress API Integration</h1>
+                    <h1 className="text-2xl font-normal">WP API</h1>
                     <div className="flex gap-4">
                         <Link href="/" className="hover:underline">
                             Home
