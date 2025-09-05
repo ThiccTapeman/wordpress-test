@@ -1,7 +1,9 @@
 // app/api/auth/[...nextauth]/route.ts
-import NextAuth from "next-auth"
+import NextAuth from "next-auth";
 
-const tokenUrl = "https://public-api.wordpress.com/oauth2/token"
+const tokenUrl = "https://public-api.wordpress.com/oauth2/token";
+const authUrl = "https://public-api.wordpress.com/oauth2/authorize";
+const userInfoUrl = "https://public-api.wordpress.com/rest/v1.1/me";
 
 const WordPressProvider = {
   id: "wordpress",
@@ -10,8 +12,8 @@ const WordPressProvider = {
   clientId: process.env.WP_CLIENT_ID,
   clientSecret: process.env.WP_CLIENT_SECRET,
   authorization: {
-    url: "https://public-api.wordpress.com/oauth2/authorize",
-    params: { scope: "global", response_type: "code" }
+    url: authUrl,
+    params: { scope: "global", response_type: "code" },
   },
   token: {
     url: tokenUrl,
@@ -21,36 +23,36 @@ const WordPressProvider = {
         code: context.params.code,
         redirect_uri: context.provider.callbackUrl,
         client_id: process.env.WP_CLIENT_ID,
-        client_secret: process.env.WP_CLIENT_SECRET
-      })
+        client_secret: process.env.WP_CLIENT_SECRET,
+      });
 
       const res = await fetch(tokenUrl, {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: body.toString()
-      })
+        body: body.toString(),
+      });
 
-      const tokens = await res.json()
+      const tokens = await res.json();
       if (!res.ok) {
-        console.error("WP token error", tokens)
-        throw new Error(tokens.error_description || "Token exchange failed")
+        console.error("WP token error", tokens);
+        throw new Error(tokens.error_description || "Token exchange failed");
       }
 
-      return { tokens }
-    }
+      return { tokens };
+    },
   },
   userinfo: {
-    url: "https://public-api.wordpress.com/rest/v1.1/me"
+    url: userInfoUrl,
   },
   profile(profile) {
     return {
       id: String(profile.ID),
       name: profile.display_name,
-      email: profile.email
-    }
+      email: profile.email,
+    };
   },
-  checks: ["state"]
-}
+  checks: ["state"],
+};
 
 export const authOptions = {
   providers: [WordPressProvider],
@@ -58,25 +60,22 @@ export const authOptions = {
   session: { strategy: "jwt" },
   debug: true,
   callbacks: {
-    async signIn({ account, profile }) {
-      return true
-    },
     async jwt({ token, account }) {
       if (account) {
-        token.accessToken = account.access_token
-        token.refreshToken = account.refresh_token
-        token.expiresAt = Date.now() + account.expires_in * 1000
+        token.accessToken = account.access_token;
+        token.refreshToken = account.refresh_token;
+        token.expiresAt = Date.now() + account.expires_in * 1000;
       }
-      return token
+      return token;
     },
     async session({ session, token }) {
-      session.accessToken = token.accessToken
-      session.refreshToken = token.refreshToken
-      session.expiresAt = token.expiresAt
-      return session
-    }
-  }
-}
+      session.accessToken = token.accessToken;
+      session.refreshToken = token.refreshToken;
+      session.expiresAt = token.expiresAt;
+      return session;
+    },
+  },
+};
 
-const handler = NextAuth(authOptions)
-export { handler as GET, handler as POST }
+const handler = NextAuth(authOptions);
+export { handler as GET, handler as POST };
